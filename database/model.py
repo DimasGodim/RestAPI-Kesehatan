@@ -5,13 +5,16 @@ Base = declarative_base()
 
 class menuMakanan(Base):
     __tablename__ = 'MenuMakanan'
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+    menuID = Column(Integer, Sequence('menuID_seq'), primary_key=True)
+    namaUser = Column(String, nullable= True)
     makananPokok = Column(JSON, nullable = True)
-    snack = Column(JSON, nullable = True)
+    makananRingan = Column(JSON, nullable = True)
+    minuman = Column(JSON, nullable = True)
+    jumlahCalori = Column(Integer, nullable = True)
 
 class dataUser(Base):
     __tablename__ = 'DataUser'
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+    userId = Column(Integer, Sequence('userID_seq'), primary_key=True)
     nama = Column(String, nullable = True)
     tinggiBadan = Column(Float, nullable = True)
     beratBadan = Column(Float, nullable = True)
@@ -21,13 +24,7 @@ class dataUser(Base):
 
 class wishlistMenu(Base):
     __tablename__ = 'WishlistMenu'
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+    wishID = Column(Integer, Sequence('wishID_seq'), primary_key=True)
     jenisMakanan = Column(String)
     beratMakanan = Column(Float)
     kaloriMakanan = Column(Float)
-
-class saranMakanan(Base):
-    __tablename__ = 'SaranMakanan'
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
-    namaClient = Column(String)
-    menuYangDisarankan = Column(JSON)
