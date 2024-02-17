@@ -5,10 +5,10 @@ routes = Blueprint(url_prefix='/Kalkulator')
 
 @routes.get('/BMI')
 def endpointBMI():
-    berat = request.args.get('beratBadan')
-    tinggi = request.args.get('tinggiBadan')
+    berat = request.args.get('berat-badan')
+    tinggi = request.args.get('tinggi-badan')
     gender = request.args.get('gender')
-    userId = request.args.get('userID', default=None)
+    userId = request.args.get('user-ID', default=None)
 
     NilaiBMI = HitungBMI(berat=berat, tinggi=tinggi, gender=gender)
 
@@ -16,11 +16,11 @@ def endpointBMI():
 
 @routes.get('/BMR')
 def endpointBMR():
-    berat = request.args.get('beratBadan')
-    tinggi = request.args.get('tinggiBadan')
+    berat = request.args.get('berat-badan')
+    tinggi = request.args.get('tinggi-badan')
     usia = request.args.get('usia')
     gender = request.args.get('gender')
-    userId = request.args.get('userID', default=None)
+    userId = request.args.get('user-ID', default=None)
 
     NilaiBMR = HitungBMR(gender=gender, berat_badan=berat, tinggi_badan=tinggi, usia=usia)
 
@@ -30,12 +30,12 @@ def endpointBMR():
 
 @routes.get('/TDEE')
 def endpointTDEE():
-    berat = request.args.get('beratBadan')
-    tinggi = request.args.get('tinggiBadan')
+    berat = request.args.get('berat-badan')
+    tinggi = request.args.get('tinggi-badan')
     usia = request.args.get('usia')
     gender = request.args.get('gender')
-    rateAktivitas = request.args.get('rateAktivitas')
-    userId = request.args.get('userID', default=None)
+    rateAktivitas = request.args.get('rate-aktivitas')
+    userId = request.args.get('user-ID', default=None)
 
     NilaiBMR = session.get('BMR')
     if NilaiBMR is None:
