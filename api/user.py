@@ -30,8 +30,6 @@ def seePlanDiet():
     planmenuID = request.args.get('plan-menu-ID')
     session = create_engine_and_session()
 
-
-
 @router.post('/make-plant-diet')
 def makePlantDiet():
     meta = request.get_json()
@@ -46,10 +44,11 @@ def makePlantDiet():
     totalKalori: float = 0
     for menu in menuID:
         pilihanMenu = session.query(menuMakanan).filter_by(menuID=menu).first()
-        pilihan = {'menu':{
+        
+        pilihan = {
             'nama-menu': pilihanMenu.namaMenu,
             'jumlah-satuan': f'{pilihanMenu.jumlah} {pilihanMenu.satuan}',
-            'kalori/menu': pilihanMenu.jumlahKalori}
+            'kalori/menu': pilihanMenu.jumlahKalori
         }
         
         response.append(pilihan)
