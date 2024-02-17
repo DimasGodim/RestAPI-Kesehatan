@@ -6,3 +6,4 @@ python-multipart
 openai
 pydantic==1.10.7
 setuptools
+pymysql

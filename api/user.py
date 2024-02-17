@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from database.jalankan import create_engine_and_session
-from database.model import menuMakanan, planMenu
+from database.model import menuMakanan, planMenu, wishlistMenu
 
-router = Blueprint(url_prefix='/user')
+router = Blueprint('/user', __name__, url_prefix='/user')
 
 @router.get('/list-menu')
 def listMenu():
@@ -14,11 +14,12 @@ def listMenu():
 
     for menu in all_menus:
         data = {
-            'menu ID': menu.menuID,
-            'nama': menu.namaMenu,
-            'jumlah satuan': f'{menu.jumlah} {menu.satuan}', 
-            'jumlah kalori': f'{menu.jumlahKalori}'
+            'menu-ID': menu.menuID,
+            'nama-menu': menu.namaMenu,
+            'jumlah-satuan': f'{menu.jumlah} {menu.satuan}',
+            'kalori': menu.jumlahKalori
         }
+
         response.append(data)
     
     session.close()
@@ -27,10 +28,19 @@ def listMenu():
 
 @router.get('/see-plan-diet')
 def seePlanDiet():
-    planmenuID = request.args.get('plan-menu-ID')
+    planmenuID = int(request.args.get('plan-menu-ID'))
     session = create_engine_and_session()
+    data = session.query(planMenu).filter_by(planID=planmenuID).first()
+    return jsonify(
+        {
+            'plan-ID': data.planID,
+            'nama-user': f'{data.namaUser}',
+            'menu': data.listMenu,
+            'total-kalori': data.totalKalori 
+        }
+    )
 
-@router.post('/make-plant-diet')
+@router.post('/make-plan-diet')
 def makePlantDiet():
     meta = request.get_json()
     
@@ -39,47 +49,68 @@ def makePlantDiet():
     targetKalori = meta.get('target-kalori')
     session = create_engine_and_session()
     
-    response = []
+    response = {
+        'menu': []
+    }
     
-    totalKalori: float = 0
+    totalKalori = 0
     for menu in menuID:
         pilihanMenu = session.query(menuMakanan).filter_by(menuID=menu).first()
         
         pilihan = {
+            'menu-ID': pilihanMenu.menuID,
             'nama-menu': pilihanMenu.namaMenu,
             'jumlah-satuan': f'{pilihanMenu.jumlah} {pilihanMenu.satuan}',
             'kalori/menu': pilihanMenu.jumlahKalori
         }
         
-        response.append(pilihan)
+        response['menu'].append(pilihan)
         totalKalori += pilihanMenu.jumlahKalori
 
-    save = planMenu(namaUser = namaUser, listMenu = response, listMenu = response, totalKalori = totalKalori)
+    save = planMenu(namaUser=namaUser, listMenu=response['menu'], totalKalori=totalKalori)
+    save.planID = int(planMenu.generate_random_key())
     session.add(save)
-    session.commit
-    session.close()
+    session.commit()
 
-    response.append(
-        {
-            'nama-user': namaUser
-        }
-    )
+    response['menu'] = [{
+        'menu-ID': item['menu-ID'],
+        'nama-menu': item['nama-menu'],
+        'jumlah-satuan': item['jumlah-satuan'],
+        'kalori/menu': item['kalori/menu']
+    } for item in response['menu']]
 
-    response.append({
+    response.update({
+        'nama-user': namaUser,
+        'plan-ID': save.planID,
         'total-kalori': totalKalori
     })
-    
+
     if targetKalori < totalKalori:
-        response.append(
-            {
-                'pesan-response': 'menu anda melebihi target kalori yang anda buat'
-            }
-        )
+        response.update({
+            'pesan-response': 'menu anda melebihi target kalori yang anda buat'
+        })
     else:
-        response.append(
-            {
-                'pesan-response': 'Kesehatan adalah kekayaan sejati, bukan kepingan emas dan perak'
-            }
-        )
+        response.update({
+            'pesan-response': 'Kesehatan adalah kekayaan sejati, bukan kepingan emas dan perak'
+        })
     
-    return jsonify(response)
+    session.close()
+    return jsonify([response])
+
+@router.post('/wish-menu')
+def wishMenu():
+    meta = request.get_json()
+    
+    namaMenu = meta.get('nama-menu')
+    berat = meta.get('berat')
+    satuan = meta.get('satuan')
+    kalori = meta.get('kalori')
+    deskripsi = meta.get('deskripsi-menu', None)
+    
+    save = wishlistMenu(namaMenu=namaMenu, berat=berat, satuan=satuan, kalori=kalori, deskripsiMenu=deskripsi)
+    save.wishID = wishlistMenu.generate_random_key()
+    session = create_engine_and_session()
+    session.add(save)
+    session.commit()
+    meta['status'] = 'permohonan menu anda telah berhasil dimasukan dalam antrian wish menu'
+    return jsonify(meta)
