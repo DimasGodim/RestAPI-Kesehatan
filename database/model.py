@@ -22,6 +22,7 @@ class menuMakanan(Base):
 class planMenu(Base):
     __tablename__ = 'PlanMakanan'
     planID = Column(Integer, primary_key=True, server_default=func.floor(func.rand() * 1000000))
+    jenisPlan = Column(String(225))
     namaUser = Column(String(225), nullable = True)
     listMenu = Column(JSON)
     totalKalori = Column(Float)

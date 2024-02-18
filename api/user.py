@@ -34,6 +34,7 @@ def seePlanDiet():
     return jsonify(
         {
             'plan-ID': data.planID,
+            'jenis-plan': data.jenisPlan,
             'nama-user': f'{data.namaUser}',
             'menu': data.listMenu,
             'total-kalori': data.totalKalori 
@@ -67,7 +68,7 @@ def makePlantDiet():
         response['menu'].append(pilihan)
         totalKalori += pilihanMenu.jumlahKalori
 
-    save = planMenu(namaUser=namaUser, listMenu=response['menu'], totalKalori=totalKalori)
+    save = planMenu(namaUser=namaUser, listMenu=response['menu'], totalKalori=totalKalori, jenisPlan='diet-plan')
     save.planID = int(planMenu.generate_random_key())
     session.add(save)
     session.commit()
