@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Float, JSON, func
+from sqlalchemy import Column, Integer, String, Text, Float, JSON, Boolean,func
 from sqlalchemy.ext.declarative import declarative_base
 from database.jalankan import Create_Engine
 import random
@@ -49,10 +49,11 @@ class wishlistMenu(Base):
     __tablename__ = 'WishlistMenu'
     wishID = Column(Integer, primary_key=True, server_default=func.floor(func.rand() * 1000000))
     namaMenu = Column(String(225))
-    berat = Column(Float)
+    jumlah = Column(Float)
     satuan = Column(String(225))
     kalori = Column(Float)
     deskripsiMenu = Column(Text, nullable = True)
+    granted = Column(Boolean, default=False)
 
     @staticmethod
     def generate_random_key():

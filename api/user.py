@@ -58,6 +58,13 @@ def makePlantDiet():
     for menu in menuID:
         pilihanMenu = session.query(menuMakanan).filter_by(menuID=menu).first()
         
+        if pilihanMenu is None:
+            return jsonify(
+                {
+                    'eror-message': 'cannot find your chossen menu'
+                }
+            ),404
+        
         pilihan = {
             'menu-ID': pilihanMenu.menuID,
             'nama-menu': pilihanMenu.namaMenu,
@@ -83,7 +90,8 @@ def makePlantDiet():
     response.update({
         'nama-user': namaUser,
         'plan-ID': save.planID,
-        'total-kalori': totalKalori
+        'total-kalori': totalKalori,
+        'jenis-plan': 'plan-diet'
     })
 
     if targetKalori < totalKalori:
@@ -103,15 +111,16 @@ def wishMenu():
     meta = request.get_json()
     
     namaMenu = meta.get('nama-menu')
-    berat = meta.get('berat')
+    jumlah = meta.get('jumlah')
     satuan = meta.get('satuan')
     kalori = meta.get('kalori')
     deskripsi = meta.get('deskripsi-menu', None)
     
-    save = wishlistMenu(namaMenu=namaMenu, berat=berat, satuan=satuan, kalori=kalori, deskripsiMenu=deskripsi)
+    save = wishlistMenu(namaMenu=namaMenu, jumlah=jumlah, satuan=satuan, kalori=kalori, deskripsiMenu=deskripsi)
     save.wishID = wishlistMenu.generate_random_key()
     session = create_engine_and_session()
     session.add(save)
     session.commit()
     meta['status'] = 'permohonan menu anda telah berhasil dimasukan dalam antrian wish menu'
+    meta['wish-ID'] = save.wishID
     return jsonify(meta)
